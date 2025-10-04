@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Results Dashboard - PPE Detection System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet">
+    <style>
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+        
+        .timeline-item {
+            position: relative;
+            padding-left: 30px;
+            padding-bottom: 20px;
+            border-left: 2px solid var(--primary-color);
+        }
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -6px;
+            top: 0;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.2);
+        }
+        
+        .timeline-item.violation::before {
+            background: var(--danger-color);
+            box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="animated-bg"></div>
+    
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+        <div class="container">
+            <a class="navbar-brand floating" href="/">
+                <i class="fas fa-hard-hat"></i> PPE Detection System
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">
+                            <i class="fas fa-upload"></i> Upload
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/camera">
+                            <i class="fas fa-video"></i> Camera
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/results">
+                            <i class="fas fa-chart-bar"></i> Results
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <!-- Header -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <h2><i class="fas fa-chart-bar"></i> Analysis Results & Statistics</h2>
+                <p class="text-muted">View historical analysis results and safety statistics</p>
+            </div>
+        </div>
+
+        <!-- Statistics Cards -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card stats-card">
+                    <div class="card-body text-center">
+                        <i class="fas fa-images fa-2x mb-2"></i>
+                        <h4 id="totalImages">0</h4>
+                        <small>Images Analyzed</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-success text-white">
+                    <div class="card-body text-center">
+                        <i class="fas fa-check-circle fa-2x mb-2"></i>
+                        <h4 id="safeImages">0</h4>
+                        <small>Safe Images</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-danger text-white">
+                    <div class="card-body text-center">
+                        <i class="fas fa-exclamation-triangle fa-2x mb-2"></i>
+                        <h4 id="violationImages">0</h4>
+                        <small>Violation Images</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-info text-white">
+                    <div class="card-body text-center">
+                        <i class="fas fa-percentage fa-2x mb-2"></i>
+                        <h4 id="safetyRate">0%</h4>
+                        <small>Safety Rate</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h6 class="card-title">Filter Results</h6>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label for="statusFilter" class="form-label">Status Filter</label>
+                                <select class="form-select" id="statusFilter">
+                                    <option value="all">All Results</option>
+                                    <option value="safe">Safe Only</option>
+                                    <option value="violation">Violations Only</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="dateFilter" class="form-label">Date Range</label>
+                                <select class="form-select" id="dateFilter">
+                                    <option value="all">All Time</option>
+                                    <option value="today">Today</option>
+                                    <option value="week">This Week</option>
+                                    <option value="month">This Month</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h6 class="card-title">Quick Actions</h6>
+                        <button class="btn btn-outline-primary me-2" onclick="refreshResults()">
+                            <i class="fas fa-refresh"></i> Refresh
+                        </button>
+                        <button class="btn btn-outline-secondary me-2" onclick="exportResults()">
+                            <i class="fas fa-download"></i> Export
+                        </button>
+                        <button class="btn btn-outline-danger" onclick="clearResults()">
+                            <i class="fas fa-trash"></i> Clear History
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results List -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h6 class="card-title">Recent Analysis Results</h6>
+                        <div id="resultsList">
+                            <!-- Results will be loaded here -->
+                            <div class="text-center py-5">
+                                <i class="fas fa-spinner fa-spin fa-2x text-muted"></i>
+                                <p class="text-muted mt-2">Loading results...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Detailed View Modal -->
+        <div class="modal fade" id="detailModal" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Analysis Details</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div id="modalContent">
+                            <!-- Detailed content will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Sample data structure for demonstration
+        // In a real application, this would be loaded from a backend API
+        let analysisResults = [];
+
+        // Generate sample data for demonstration
+        function generateSampleData() {
+            const sampleResults = [];
+            const statuses = ['SAFE', 'VIOLATION DETECTED'];
+            const violationTypes = ['NO-Hardhat', 'NO-Mask', 'NO-Safety Vest'];
+            
+            for (let i = 0; i < 20; i++) {
+                const timestamp = new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000);
+                const status = statuses[Math.floor(Math.random() * statuses.length)];
+                const violationsCount = status === 'SAFE' ? 0 : Math.floor(Math.random() * 3) + 1;
+                const totalDetections = Math.floor(Math.random() * 5) + 1;
+                
+                const violations = [];
+                if (violationsCount > 0) {
+                    for (let j = 0; j < violationsCount; j++) {
+                        violations.push({
+                            class_name: violationTypes[Math.floor(Math.random() * violationTypes.length)],
+                            confidence: (Math.random() * 0.4 + 0.6).toFixed(2)
+                        });
+                    }
+                }
+
+                sampleResults.push({
+                    id: i + 1,
+                    timestamp: timestamp.toISOString(),
+                    safety_status: status,
+                    violations_count: violationsCount,
+                    total_detections: totalDetections,
+                    violations: violations,
+                    safety_message: status === 'SAFE' ? 
+                        'All safety equipment detected. Workplace is safe!' : 
+                        `Safety violations detected: ${violations.map(v => v.class_name).join(', ')}`
+                });
+            }
+            
+            return sampleResults.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+        }
+
+        // Initialize with sample data
+        analysisResults = generateSampleData();
+
+        // Load and display results
+        function loadResults() {
+            updateStatistics();
+            displayResults(analysisResults);
+        }
+
+        function updateStatistics() {
+            const total = analysisResults.length;
+            const safe = analysisResults.filter(r => r.safety_status === 'SAFE').length;
+            const violations = total - safe;
+            const safetyRate = total > 0 ? Math.round((safe / total) * 100) : 0;
+
+            document.getElementById('totalImages').textContent = total;
+            document.getElementById('safeImages').textContent = safe;
+            document.getElementById('violationImages').textContent = violations;
+            document.getElementById('safetyRate').textContent = safetyRate + '%';
+        }
+
+        function displayResults(results) {
+            const resultsList = document.getElementById('resultsList');
+            
+            if (results.length === 0) {
+                resultsList.innerHTML = `
+                    <div class="text-center py-5">
+                        <i class="fas fa-inbox fa-3x text-muted"></i>
+                        <p class="text-muted mt-2">No results found</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const html = results.map(result => `
+                <div class="result-item border rounded p-3 mb-3" onclick="showDetails(${result.id})">
+                    <div class="row align-items-center">
+                        <div class="col-md-2">
+                            <div class="bg-light rounded p-2 text-center">
+                                <i class="fas fa-image fa-2x text-muted"></i>
+                                <small class="d-block text-muted">Image #${result.id}</small>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="mb-1">
+                                <span class="badge ${result.safety_status === 'SAFE' ? 'safe-badge' : 'violation-badge'}">
+                                    ${result.safety_status}
+                                </span>
+                            </h6>
+                            <p class="mb-1 text-muted">${result.safety_message}</p>
+                            <small class="text-muted">
+                                <i class="fas fa-clock"></i> ${new Date(result.timestamp).toLocaleString()}
+                            </small>
+                        </div>
+                        <div class="col-md-2 text-center">
+                            <div class="small">
+                                <div><strong>${result.total_detections}</strong></div>
+                                <div class="text-muted">Detections</div>
+                            </div>
+                        </div>
+                        <div class="col-md-2 text-center">
+                            <div class="small">
+                                <div class="text-danger"><strong>${result.violations_count}</strong></div>
+                                <div class="text-muted">Violations</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            resultsList.innerHTML = html;
+        }
+
+        function showDetails(resultId) {
+            const result = analysisResults.find(r => r.id === resultId);
+            if (!result) return;
+
+            const modalContent = document.getElementById('modalContent');
+            
+            modalContent.innerHTML = `
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Analysis Summary</h6>
+                        <table class="table table-sm">
+                            <tr>
+                                <td><strong>Status:</strong></td>
+                                <td>
+                                    <span class="badge ${result.safety_status === 'SAFE' ? 'bg-success' : 'bg-danger'}">
+                                        ${result.safety_status}
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>Timestamp:</strong></td>
+                                <td>${new Date(result.timestamp).toLocaleString()}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Total Detections:</strong></td>
+                                <td>${result.total_detections}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Violations:</strong></td>
+                                <td>${result.violations_count}</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Safety Message</h6>
+                        <div class="alert ${result.safety_status === 'SAFE' ? 'alert-success' : 'alert-danger'}">
+                            ${result.safety_message}
+                        </div>
+                        
+                        ${result.violations.length > 0 ? `
+                            <h6>Violations Detected</h6>
+                            <ul class="list-group list-group-flush">
+                                ${result.violations.map(v => `
+                                    <li class="list-group-item d-flex justify-content-between">
+                                        <span>${v.class_name}</span>
+                                        <span class="badge bg-secondary">${v.confidence}</span>
+                                    </li>
+                                `).join('')}
+                            </ul>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+
+            const modal = new bootstrap.Modal(document.getElementById('detailModal'));
+            modal.show();
+        }
+
+        function filterResults() {
+            const statusFilter = document.getElementById('statusFilter').value;
+            const dateFilter = document.getElementById('dateFilter').value;
+            
+            let filtered = [...analysisResults];
+
+            // Apply status filter
+            if (statusFilter !== 'all') {
+                filtered = filtered.filter(r => {
+                    if (statusFilter === 'safe') return r.safety_status === 'SAFE';
+                    if (statusFilter === 'violation') return r.safety_status === 'VIOLATION DETECTED';
+                    return true;
+                });
+            }
+
+            // Apply date filter
+            if (dateFilter !== 'all') {
+                const now = new Date();
+                const cutoff = new Date();
+                
+                if (dateFilter === 'today') {
+                    cutoff.setHours(0, 0, 0, 0);
+                } else if (dateFilter === 'week') {
+                    cutoff.setDate(now.getDate() - 7);
+                } else if (dateFilter === 'month') {
+                    cutoff.setMonth(now.getMonth() - 1);
+                }
+
+                filtered = filtered.filter(r => new Date(r.timestamp) >= cutoff);
+            }
+
+            displayResults(filtered);
+        }
+
+        function refreshResults() {
+            // In a real application, this would fetch fresh data from the server
+            loadResults();
+        }
+
+        function exportResults() {
+            // Generate CSV data
+            const csv = [
+                ['ID', 'Timestamp', 'Status', 'Total Detections', 'Violations', 'Message'],
+                ...analysisResults.map(r => [
+                    r.id,
+                    new Date(r.timestamp).toLocaleString(),
+                    r.safety_status,
+                    r.total_detections,
+                    r.violations_count,
+                    r.safety_message.replace(/,/g, ';')
+                ])
+            ].map(row => row.join(',')).join('\n');
+
+            // Download CSV file
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `ppe_detection_results_${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function clearResults() {
+            if (confirm('Are you sure you want to clear all analysis history?')) {
+                analysisResults = [];
+                loadResults();
+            }
+        }
+
+        // Event listeners
+        document.getElementById('statusFilter').addEventListener('change', filterResults);
+        document.getElementById('dateFilter').addEventListener('change', filterResults);
+
+        // Initialize
+        loadResults();
+    </script>
+</body>
+</html>

@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Camera - PPE Detection System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet">
+    <style>
+        .live-indicator {
+            display: inline-block;
+            padding: 6px 12px;
+            background: rgba(239, 68, 68, 0.1);
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+        
+        .live-indicator.active {
+            background: rgba(16, 185, 129, 0.1);
+            animation: livePulse 2s infinite;
+        }
+        
+        @keyframes livePulse {
+            0%, 100% {
+                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+            }
+            50% {
+                box-shadow: 0 0 0 10px rgba(16, 185, 129, 0);
+            }
+        }
+        
+        .detection-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+        }
+        
+        .alert-card {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="animated-bg"></div>
+    
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+        <div class="container">
+            <a class="navbar-brand floating" href="/">
+                <i class="fas fa-hard-hat"></i> PPE Detection System
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">
+                            <i class="fas fa-upload"></i> Upload
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/camera">
+                            <i class="fas fa-video"></i> Camera
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/results">
+                            <i class="fas fa-chart-bar"></i> Results
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <i class="fas fa-video"></i> Live Camera Feed
+                        </h5>
+                        
+                        <div class="camera-container">
+                            <video id="cameraFeed" class="camera-feed" autoplay muted></video>
+                            <canvas id="detectionCanvas" class="detection-overlay"></canvas>
+                            
+                            <div class="camera-controls">
+                                <button id="startBtn" class="btn btn-success me-2">
+                                    <i class="fas fa-play"></i> Start Camera
+                                </button>
+                                <button id="stopBtn" class="btn btn-danger me-2" disabled>
+                                    <i class="fas fa-stop"></i> Stop Camera
+                                </button>
+                                <button id="captureBtn" class="btn btn-primary" disabled>
+                                    <i class="fas fa-camera"></i> Capture & Analyze
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-3">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="checkbox" id="realTimeDetection" checked>
+                                <label class="form-check-label" for="realTimeDetection">
+                                    Real-time Detection
+                                </label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="checkbox" id="audioAlerts" checked>
+                                <label class="form-check-label" for="audioAlerts">
+                                    Audio Alerts
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h6 class="card-title">
+                            <span class="status-indicator" id="statusIndicator"></span>
+                            Camera Status
+                        </h6>
+                        <p id="statusText" class="text-muted">Camera not active</p>
+                        
+                        <hr>
+                        
+                        <h6>Live Detection Results</h6>
+                        <div id="liveResults">
+                            <p class="text-muted">No detections yet</p>
+                        </div>
+                        
+                        <hr>
+                        
+                        <h6>Safety Statistics</h6>
+                        <div class="row text-center">
+                            <div class="col-6">
+                                <div class="bg-light p-2 rounded">
+                                    <h5 id="totalFrames" class="text-primary mb-0">0</h5>
+                                    <small class="text-muted">Frames</small>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="bg-light p-2 rounded">
+                                    <h5 id="violationFrames" class="text-danger mb-0">0</h5>
+                                    <small class="text-muted">Violations</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Alerts -->
+                <div class="card mt-3">
+                    <div class="card-body">
+                        <h6 class="card-title">
+                            <i class="fas fa-bell"></i> Recent Alerts
+                        </h6>
+                        <div id="alertsList">
+                            <p class="text-muted">No alerts yet</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let stream = null;
+        let detectionInterval = null;
+        let frameCount = 0;
+        let violationCount = 0;
+        let alerts = [];
+
+        const startBtn = document.getElementById('startBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const captureBtn = document.getElementById('captureBtn');
+        const cameraFeed = document.getElementById('cameraFeed');
+        const statusIndicator = document.getElementById('statusIndicator');
+        const statusText = document.getElementById('statusText');
+        const liveResults = document.getElementById('liveResults');
+        const totalFrames = document.getElementById('totalFrames');
+        const violationFrames = document.getElementById('violationFrames');
+        const alertsList = document.getElementById('alertsList');
+        const realTimeDetection = document.getElementById('realTimeDetection');
+        const audioAlerts = document.getElementById('audioAlerts');
+
+        // Event listeners
+        startBtn.addEventListener('click', startCamera);
+        stopBtn.addEventListener('click', stopCamera);
+        captureBtn.addEventListener('click', captureAndAnalyze);
+
+        async function startCamera() {
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                cameraFeed.srcObject = stream;
+                
+                updateStatus(true);
+                startBtn.disabled = true;
+                stopBtn.disabled = false;
+                captureBtn.disabled = false;
+
+                // Start real-time detection if enabled
+                if (realTimeDetection.checked) {
+                    detectionInterval = setInterval(processFrame, 3000); // Process every 3 seconds
+                }
+            } catch (error) {
+                alert('Error accessing camera: ' + error.message);
+                updateStatus(false);
+            }
+        }
+
+        function stopCamera() {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+                stream = null;
+            }
+            
+            if (detectionInterval) {
+                clearInterval(detectionInterval);
+                detectionInterval = null;
+            }
+
+            updateStatus(false);
+            startBtn.disabled = false;
+            stopBtn.disabled = true;
+            captureBtn.disabled = true;
+            
+            cameraFeed.srcObject = null;
+        }
+
+        function updateStatus(active) {
+            if (active) {
+                statusIndicator.className = 'status-indicator status-active';
+                statusText.textContent = 'Camera active - Live feed';
+            } else {
+                statusIndicator.className = 'status-indicator status-inactive';
+                statusText.textContent = 'Camera not active';
+            }
+        }
+
+        async function processFrame() {
+            if (!stream || !realTimeDetection.checked) return;
+
+            try {
+                const canvas = document.createElement('canvas');
+                const context = canvas.getContext('2d');
+                
+                canvas.width = cameraFeed.videoWidth;
+                canvas.height = cameraFeed.videoHeight;
+                context.drawImage(cameraFeed, 0, 0);
+                
+                // Convert canvas to blob
+                canvas.toBlob(async (blob) => {
+                    const formData = new FormData();
+                    formData.append('file', blob, 'frame.jpg');
+                    formData.append('enable_audio', audioAlerts.checked);
+
+                    try {
+                        const response = await fetch('/upload', {
+                            method: 'POST',
+                            body: formData
+                        });
+
+                        const result = await response.json();
+                        if (result.success) {
+                            updateLiveResults(result);
+                            frameCount++;
+                            if (result.violations_count > 0) {
+                                violationCount++;
+                                addAlert(result.safety_message);
+                            }
+                            updateStatistics();
+                        }
+                    } catch (error) {
+                        console.error('Frame processing error:', error);
+                    }
+                }, 'image/jpeg', 0.8);
+            } catch (error) {
+                console.error('Frame capture error:', error);
+            }
+        }
+
+        async function captureAndAnalyze() {
+            if (!stream) return;
+
+            try {
+                const canvas = document.createElement('canvas');
+                const context = canvas.getContext('2d');
+                
+                canvas.width = cameraFeed.videoWidth;
+                canvas.height = cameraFeed.videoHeight;
+                context.drawImage(cameraFeed, 0, 0);
+                
+                canvas.toBlob(async (blob) => {
+                    const formData = new FormData();
+                    formData.append('file', blob, 'capture.jpg');
+                    formData.append('enable_audio', audioAlerts.checked);
+
+                    captureBtn.disabled = true;
+                    captureBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analyzing...';
+
+                    try {
+                        const response = await fetch('/upload', {
+                            method: 'POST',
+                            body: formData
+                        });
+
+                        const result = await response.json();
+                        if (result.success) {
+                            updateLiveResults(result);
+                            addAlert(`Manual capture: ${result.safety_message}`);
+                        } else {
+                            alert('Analysis failed: ' + result.error);
+                        }
+                    } catch (error) {
+                        alert('Capture failed: ' + error.message);
+                    } finally {
+                        captureBtn.disabled = false;
+                        captureBtn.innerHTML = '<i class="fas fa-camera"></i> Capture & Analyze';
+                    }
+                }, 'image/jpeg', 0.9);
+            } catch (error) {
+                alert('Capture error: ' + error.message);
+            }
+        }
+
+        function updateLiveResults(result) {
+            let html = `
+                <div class="mb-2">
+                    <strong>Status:</strong> 
+                    <span class="badge ${result.safety_status === 'VIOLATION DETECTED' ? 'bg-danger' : 'bg-success'}">
+                        ${result.safety_status}
+                    </span>
+                </div>
+                <div class="mb-2">
+                    <strong>Detections:</strong> ${result.total_detections}
+                    <br>
+                    <strong>Violations:</strong> ${result.violations_count}
+                </div>
+            `;
+
+            if (result.detections.length > 0) {
+                html += '<div><strong>Found:</strong><ul class="list-unstyled mt-1">';
+                result.detections.forEach(detection => {
+                    const isViolation = result.violations.some(v => v.class_name === detection.class_name);
+                    html += `<li class="small ${isViolation ? 'text-danger' : 'text-success'}">
+                        ${detection.class_name} (${detection.confidence})
+                    </li>`;
+                });
+                html += '</ul></div>';
+            }
+
+            liveResults.innerHTML = html;
+        }
+
+        function addAlert(message) {
+            const timestamp = new Date().toLocaleTimeString();
+            alerts.unshift({ message, timestamp });
+            
+            // Keep only last 5 alerts
+            if (alerts.length > 5) {
+                alerts = alerts.slice(0, 5);
+            }
+
+            updateAlertsList();
+        }
+
+        function updateAlertsList() {
+            if (alerts.length === 0) {
+                alertsList.innerHTML = '<p class="text-muted">No alerts yet</p>';
+                return;
+            }
+
+            const html = alerts.map(alert => `
+                <div class="alert alert-warning alert-sm p-2 mb-2">
+                    <small class="text-muted">${alert.timestamp}</small>
+                    <div class="small">${alert.message}</div>
+                </div>
+            `).join('');
+
+            alertsList.innerHTML = html;
+        }
+
+        function updateStatistics() {
+            totalFrames.textContent = frameCount;
+            violationFrames.textContent = violationCount;
+        }
+
+        // Handle page unload
+        window.addEventListener('beforeunload', stopCamera);
+    </script>
+</body>
+</html>
