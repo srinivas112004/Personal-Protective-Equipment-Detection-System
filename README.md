@@ -43,54 +43,61 @@ A comprehensive Personal Protective Equipment (PPE) detection system with a mode
 ## 📁 Project Structure
 
 ```
-PPE detection/
-├── app.py                      # Main Flask web application
-├── main.py                     # Original standalone detection script
-├── model.ipynb                 # Jupyter notebook for model training/testing
-├── requirements.txt            # Python dependencies
-├── .gitignore                  # Git ignore rules
-├── README.md                   # Project documentation
+PPE Detection/
 │
-├── 🤖 Models/
-│   ├── best.pt                 # Trained YOLO model (primary)
-│   ├── yolov8n.pt              # YOLOv8 Nano model
-│   └── yolov8s.pt              # YOLOv8 Small model
+├── 📄 Core Application Files
+│   ├── app.py                      # Flask web server
+│   ├── main.py                     # Standalone CLI detection script
+│   ├── requirements.txt            # Python dependencies
+│   └── data.yaml                   # Dataset configuration
 │
-├── ⚙️ Configuration/
-│   └── data.yaml               # Dataset configuration
+├── 📓 Development Files
+│   ├── model.ipynb                 # Jupyter notebook for model training
+│   ├── .gitignore                  # Git ignore configuration
+│   └── README.md                   # Project documentation
 │
-├── 🌐 Web Interface/
-│   ├── templates/              # HTML templates
-│   │   ├── index.html          # Main upload page (centered layout)
-│   │   ├── camera.html         # Live camera detection
-│   │   └── results.html        # Results dashboard
-│   └── static/                 # Static assets
-│       ├── style.css           # Modern CSS (500+ lines, animations)
-│       └── app.js              # JavaScript utilities
+├── 🚀 Quick Start Scripts
+│   ├── install_dependencies.bat    # One-click dependency installer
+│   └── start_server.bat            # One-click server launcher
 │
-├── 📂 Storage/
-│   ├── uploads/                # User uploaded images
-│   ├── results/                # Processed detection results
-│   └── runs/                   # YOLO training/detection runs
+├── 🤖 AI Models
+│   ├── best.pt                     # Primary trained YOLO model (recommended)
+│   ├── yolov8n.pt                  # YOLOv8 Nano (fastest, lightweight)
+│   └── yolov8s.pt                  # YOLOv8 Small (balanced speed/accuracy)
 │
-├── 📊 Dataset/
-│   └── css-data/               # PPE detection training dataset
-│       ├── train/              # Training images & labels
-│       │   ├── images/
-│       │   └── labels/
-│       ├── valid/              # Validation images & labels
-│       │   ├── images/
-│       │   └── labels/
-│       └── test/               # Test images & labels
-│           ├── images/
-│           └── labels/
+├── 🌐 Web Interface
+│   ├── templates/
+│   │   ├── index.html              # Main upload page (centered layout)
+│   │   ├── camera.html             # Live camera detection page
+│   │   └── results.html            # Results dashboard page
+│   │
+│   └── static/
+│       ├── style.css               # Custom CSS (500+ lines, 30+ animations)
+│       └── app.js                  # JavaScript utilities and interactions
 │
-└── 🖼️ Sample Images/
-    ├── img.jpg                 # Test image 1
-    ├── img2.jpg                # Test image 2
-    ├── img3.jpg                # Test image 3
-    ├── img4.jpg                # Test image 4
-    └── img5.jpg                # Test image 5
+├── 📂 Runtime Storage (auto-generated)
+│   ├── uploads/                    # User uploaded images
+│   ├── results/                    # Processed detection results
+│   └── runs/                       # YOLO training/detection runs
+│
+├── 📊 Training Dataset
+│   └── css-data/
+│       ├── train/
+│       │   ├── images/             # Training images
+│       │   └── labels/             # Training labels (.txt)
+│       ├── valid/
+│       │   ├── images/             # Validation images
+│       │   └── labels/             # Validation labels (.txt)
+│       └── test/
+│           ├── images/             # Test images
+│           └── labels/             # Test labels (.txt)
+│
+└── 🖼️ Sample Test Images
+    ├── img.jpg                     # Sample image 1
+    ├── img2.jpg                    # Sample image 2
+    ├── img3.jpg                    # Sample image 3
+    ├── img4.jpg                    # Sample image 4
+    └── img5.jpg                    # Sample image 5
 ```
 
 ## 🚀 Installation & Setup
@@ -103,7 +110,21 @@ PPE detection/
 
 ### Quick Start
 
-#### Installation Steps 🛠️
+#### Method 1: Automated Setup (Recommended) ⚡
+```bash
+# Step 1: Clone the repository
+git clone https://github.com/srinivas112004/Personal-Protective-Equipment-Detection-System.git
+cd Personal-Protective-Equipment-Detection-System
+
+# Step 2: Double-click to install dependencies
+install_dependencies.bat
+
+# Step 3: Double-click to start the server
+start_server.bat
+```
+The application will automatically open in your browser at `http://localhost:5000`
+
+#### Method 2: Manual Installation 🛠️
 ```bash
 # Step 1: Clone the repository
 git clone https://github.com/srinivas112004/Personal-Protective-Equipment-Detection-System.git
@@ -491,6 +512,8 @@ This project is intended for educational and safety compliance purposes. Please 
   - Performance evaluation
 
 ### Utility Scripts
+- **install_dependencies.bat** - One-click dependency installer (Windows)
+- **start_server.bat** - One-click server launcher (Windows)
 - **main.py** - Standalone CLI detection script (original version)
 
 ## 🔗 Repository
