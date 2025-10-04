@@ -105,21 +105,8 @@ PPE Detection/
 
 ### Quick Start
 
-#### Method 1: Automated Setup (Recommended) ⚡
-```bash
-# Step 1: Clone the repository
-git clone https://github.com/srinivas112004/Personal-Protective-Equipment-Detection-System.git
-cd Personal-Protective-Equipment-Detection-System
 
-# Step 2: Double-click to install dependencies
-install_dependencies.bat
-
-# Step 3: Double-click to start the server
-start_server.bat
-```
-The application will automatically open in your browser at `http://localhost:5000`
-
-#### Method 2: Manual Installation 🛠️
+####  Installation 🛠️
 ```bash
 # Step 1: Clone the repository
 git clone https://github.com/srinivas112004/Personal-Protective-Equipment-Detection-System.git
