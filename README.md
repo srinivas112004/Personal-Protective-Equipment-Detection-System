@@ -40,67 +40,109 @@ A comprehensive Personal Protective Equipment (PPE) detection system with a mode
 - Missing Face Mask (NO-Mask)
 - Missing Safety Vest (NO-Safety Vest)
 
-## Project Structure
+## 📁 Project Structure
 
 ```
 PPE detection/
-├── app.py               # Main Flask application
-├── main.py              # Original detection script
-├── requirements.txt     # Python dependencies
-├── best.pt              # Trained YOLO model
-├── data.yaml            # Dataset configuration
-├── templates/           # HTML templates
-│   ├── index.html       # Main upload page (centered layout)
-│   ├── camera.html      # Camera feed page
-│   └── results.html     # Results dashboard
-├── static/              # Static files
-│   ├── style.css        # Modern CSS with animations (500+ lines)
-│   └── app.js           # JavaScript utilities and interactions
-├── uploads/             # Uploaded images storage
-├── results/             # Processed results storage
-├── README.md            # This file
-└── css-data/           # Training dataset
-    ├── train/
-    ├── valid/
-    └── test/
+├── app.py                      # Main Flask web application
+├── main.py                     # Original standalone detection script
+├── model.ipynb                 # Jupyter notebook for model training/testing
+├── requirements.txt            # Python dependencies
+├── .gitignore                  # Git ignore rules
+├── README.md                   # Project documentation
+│
+├── 🤖 Models/
+│   ├── best.pt                 # Trained YOLO model (primary)
+│   ├── yolov8n.pt              # YOLOv8 Nano model
+│   └── yolov8s.pt              # YOLOv8 Small model
+│
+├── ⚙️ Configuration/
+│   └── data.yaml               # Dataset configuration
+│
+├── 🌐 Web Interface/
+│   ├── templates/              # HTML templates
+│   │   ├── index.html          # Main upload page (centered layout)
+│   │   ├── camera.html         # Live camera detection
+│   │   └── results.html        # Results dashboard
+│   └── static/                 # Static assets
+│       ├── style.css           # Modern CSS (500+ lines, animations)
+│       └── app.js              # JavaScript utilities
+│
+├── 📂 Storage/
+│   ├── uploads/                # User uploaded images
+│   ├── results/                # Processed detection results
+│   └── runs/                   # YOLO training/detection runs
+│
+├── 📊 Dataset/
+│   └── css-data/               # PPE detection training dataset
+│       ├── train/              # Training images & labels
+│       │   ├── images/
+│       │   └── labels/
+│       ├── valid/              # Validation images & labels
+│       │   ├── images/
+│       │   └── labels/
+│       └── test/               # Test images & labels
+│           ├── images/
+│           └── labels/
+│
+└── 🖼️ Sample Images/
+    ├── img.jpg                 # Test image 1
+    ├── img2.jpg                # Test image 2
+    ├── img3.jpg                # Test image 3
+    ├── img4.jpg                # Test image 4
+    └── img5.jpg                # Test image 5
 ```
 
-## Installation & Setup
+## 🚀 Installation & Setup
 
 ### Prerequisites
-- Python 3.8 or higher
-- Webcam (for live detection)
-- Modern web browser (Chrome, Firefox, Safari, Edge)
+- **Python 3.8+** (Python 3.10 recommended)
+- **Webcam** (for live detection feature)
+- **Modern web browser** (Chrome, Firefox, Safari, Edge)
+- **Git** (for cloning the repository)
 
-### Quick Start (Windows)
+### Quick Start
 
-#### Option 1: Using Batch Files (Easiest)
+#### Installation Steps 🛠️
 ```bash
-# First time setup
-Double-click: install_dependencies.bat
+# Step 1: Clone the repository
+git clone https://github.com/srinivas112004/Personal-Protective-Equipment-Detection-System.git
+cd Personal-Protective-Equipment-Detection-System
 
-# Start the application
-Double-click: start_server.bat
-```
+# Step 2: Create virtual environment (optional but recommended)
+python -m venv venv
+venv\Scripts\activate  # On Windows
+# source venv/bin/activate  # On Linux/Mac
 
-#### Option 2: Manual Installation
-```bash
-# Step 1: Install Dependencies
+# Step 3: Install dependencies
 pip install -r requirements.txt
 
-# Step 2: Run the Application
+# Step 4: Run the application
 python app.py
 ```
 
-The application will start on `http://localhost:5000`
+### Access the Application
+Once the server is running, open your browser and navigate to:
+```
+http://localhost:5000
+```
 
-### Required Dependencies
-- Flask - Web framework
-- OpenCV - Image processing
-- Ultralytics YOLO - Object detection
-- pyttsx3 - Text-to-speech
-- Pillow - Image handling
-- Flask-CORS - Cross-origin support
+### 📦 Required Dependencies
+The following packages will be installed automatically:
+- **Flask** (2.3.3) - Web framework
+- **flask-cors** - Cross-origin resource sharing
+- **opencv-python** - Computer vision and image processing
+- **ultralytics** - YOLOv8 object detection
+- **pyttsx3** - Text-to-speech engine
+- **Pillow** - Image handling and manipulation
+- **numpy** - Numerical operations
+
+### 🔧 First-Time Setup Notes
+
+1. **Model Files**: The repository includes pre-trained models (`best.pt`, `yolov8n.pt`, `yolov8s.pt`)
+2. **Dataset**: The `css-data/` folder contains the training dataset
+3. **Sample Images**: Use `img.jpg` through `img5.jpg` for testing
+4. **Folders**: `uploads/`, `results/`, and `runs/` are created automatically
 
 ## Usage Guide
 
@@ -315,29 +357,84 @@ Modify the `generate_safety_message` function to customize violation messages.
    - Ensure clear, unobstructed views of PPE
    - Use higher resolution images (1920x1080 recommended)
 
-## Development
+## 🛠️ Development
+
+### Project Overview
+This PPE Detection System was built to enhance workplace safety through automated PPE compliance monitoring. The project evolved from a simple CLI script (`main.py`) to a full-featured web application with modern UI/UX.
+
+### Technology Stack
+
+**Frontend**
+- HTML5 - Semantic structure
+- CSS3 - Modern styling with 30+ animations
+- Bootstrap 5 - Responsive grid system
+- JavaScript (ES6+) - Interactive functionality
+- Particles.js - Animated background
+- Font Awesome 6 - Icon library
+- Google Fonts (Inter) - Typography
+
+**Backend**
+- Flask 2.3.3 - Python web framework
+- OpenCV - Image processing
+- Ultralytics YOLOv8 - Object detection
+- pyttsx3 - Text-to-speech
+- Pillow - Image manipulation
+- NumPy - Array operations
+
+**Models**
+- **best.pt** - Primary trained model (recommended)
+- **yolov8n.pt** - Nano model (fastest, lightweight)
+- **yolov8s.pt** - Small model (balanced speed/accuracy)
+
+### Development Workflow
+
+1. **Backend Development** (`app.py`):
+   - Flask routes and endpoints
+   - YOLO model integration
+   - Image processing logic
+   - Audio alert system
+
+2. **Frontend Development**:
+   - Templates: `templates/*.html`
+   - Styling: `static/style.css`
+   - Scripts: `static/app.js`
+
+3. **Model Training** (`model.ipynb`):
+   - Dataset preparation
+   - Model training/fine-tuning
+   - Performance evaluation
+   - Export to `.pt` format
 
 ### Adding New Features
-1. Modify `app.py` for backend changes
-2. Update HTML templates in `templates/` for UI changes
-3. Add styles to `static/style.css` for visual enhancements
-4. Add interactivity to `static/app.js`
-5. Test thoroughly with various image types
 
-### Project Structure
-- **Backend**: Flask application (`app.py`)
-- **Frontend**: HTML templates with Bootstrap 5
-- **Styling**: Custom CSS with animations (`static/style.css`)
-- **Interactivity**: Vanilla JavaScript + Particles.js (`static/app.js`)
-- **Detection**: YOLO model integration for PPE detection
+1. **New PPE Class Detection**:
+   - Update `CLASSES` dict in `app.py`
+   - Retrain model with new class data
+   - Update UI to display new class
 
-### Database Integration (Future Enhancement)
-To add persistent storage:
-1. Choose a database (SQLite, PostgreSQL, MongoDB, etc.)
-2. Create models for storing analysis results
-3. Update the results page to fetch from database
-4. Add data management endpoints (CRUD operations)
-5. Implement user authentication if needed
+2. **UI Enhancements**:
+   - Modify `templates/*.html` for structure
+   - Update `static/style.css` for styling
+   - Add interactions in `static/app.js`
+
+3. **API Endpoints**:
+   - Add route in `app.py`
+   - Define request/response format
+   - Update documentation
+
+### Future Development Roadmap
+- [ ] **Database Integration** - PostgreSQL/MongoDB for result history
+- [ ] **User Authentication** - Login system with profiles
+- [ ] **Multi-language Support** - i18n implementation
+- [ ] **PDF Export** - Generate compliance reports
+- [ ] **Email Notifications** - Alert system for violations
+- [ ] **Mobile App** - React Native/Flutter version
+- [ ] **Analytics Dashboard** - Charts and statistics
+- [ ] **Multi-camera Support** - Monitor multiple locations
+- [ ] **Custom Training UI** - Train models via web interface
+- [ ] **REST API** - Third-party integration endpoints
+- [ ] **Cloud Deployment** - AWS/Azure/GCP hosting
+- [ ] **Real-time Alerts** - WebSocket notifications
 
 ## 🚀 Technologies Used
 
@@ -378,11 +475,34 @@ To add persistent storage:
 
 This project is intended for educational and safety compliance purposes. Please ensure compliance with local regulations and privacy laws when deploying in production environments.
 
-## 📚 Additional Documentation
+## 📚 Additional Files
 
-- **QUICKSTART.md** - Quick start guide with installation steps
-- **UI_FEATURES.md** - Complete list of all 30+ UI features
-- **ENHANCEMENTS_SUMMARY.md** - Summary of all enhancements made
+### Documentation
+- **README.md** - Complete project documentation (this file)
+- **QUICKSTART.md** - Quick start guide
+- **UI_FEATURES.md** - List of all 30+ UI features  
+- **ENHANCEMENTS_SUMMARY.md** - Summary of enhancements
+
+### Notebooks
+- **model.ipynb** - Jupyter notebook for:
+  - Model training experiments
+  - Testing different YOLO versions
+  - Dataset analysis
+  - Performance evaluation
+
+### Utility Scripts
+- **main.py** - Standalone CLI detection script (original version)
+
+## 🔗 Repository
+
+**GitHub**: https://github.com/srinivas112004/Personal-Protective-Equipment-Detection-System
+
+### Repository Features
+- ✅ Clean commit history
+- ✅ `.gitignore` configured (excludes cache, runs, temp files)
+- ✅ Comprehensive documentation
+- ✅ Ready for deployment
+- ✅ Active maintenance
 
 ## 🎯 Future Enhancements
 
