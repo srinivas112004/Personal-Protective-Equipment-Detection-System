@@ -46,7 +46,6 @@ A comprehensive Personal Protective Equipment (PPE) detection system with a mode
 PPE Detection/
 │
 ├── 📄 Core Application Files
-│   ├── app.py                      # Flask web server
 │   ├── main.py                     # Standalone CLI detection script
 │   ├── requirements.txt            # Python dependencies
 │   └── data.yaml                   # Dataset configuration
