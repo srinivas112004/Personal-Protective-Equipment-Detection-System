@@ -44,9 +44,9 @@ A comprehensive Personal Protective Equipment (PPE) detection system with a mode
 
 ```
 PPE detection/
-├── app.py                 # Main Flask application
-├── main.py               # Original detection script
-├── requirements.txt      # Python dependencies
+├── app.py               # Main Flask application
+├── main.py              # Original detection script
+├── requirements.txt     # Python dependencies
 ├── best.pt              # Trained YOLO model
 ├── data.yaml            # Dataset configuration
 ├── templates/           # HTML templates
@@ -58,12 +58,7 @@ PPE detection/
 │   └── app.js           # JavaScript utilities and interactions
 ├── uploads/             # Uploaded images storage
 ├── results/             # Processed results storage
-├── start_server.bat     # Quick start script (Windows)
-├── install_dependencies.bat  # Setup script (Windows)
 ├── README.md            # This file
-├── QUICKSTART.md        # Quick start guide
-├── UI_FEATURES.md       # Complete UI features list
-├── ENHANCEMENTS_SUMMARY.md  # Enhancement summary
 └── css-data/           # Training dataset
     ├── train/
     ├── valid/
