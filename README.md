@@ -55,10 +55,6 @@ PPE Detection/
 │   ├── .gitignore                  # Git ignore configuration
 │   └── README.md                   # Project documentation
 │
-├── 🚀 Quick Start Scripts
-│   ├── install_dependencies.bat    # One-click dependency installer
-│   └── start_server.bat            # One-click server launcher
-│
 ├── 🤖 AI Models
 │   ├── best.pt                     # Primary trained YOLO model (recommended)
 │   ├── yolov8n.pt                  # YOLOv8 Nano (fastest, lightweight)
