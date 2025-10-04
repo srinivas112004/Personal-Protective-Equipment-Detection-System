@@ -46,6 +46,7 @@ A comprehensive Personal Protective Equipment (PPE) detection system with a mode
 PPE Detection/
 │
 ├── 📄 Core Application Files
+│   ├── app.py                      # Flask web server
 │   ├── main.py                     # Standalone CLI detection script
 │   ├── requirements.txt            # Python dependencies
 │   └── data.yaml                   # Dataset configuration
@@ -54,6 +55,10 @@ PPE Detection/
 │   ├── model.ipynb                 # Jupyter notebook for model training
 │   ├── .gitignore                  # Git ignore configuration
 │   └── README.md                   # Project documentation
+│
+├── 🚀 Quick Start Scripts
+│   ├── install_dependencies.bat    # One-click dependency installer
+│   └── start_server.bat            # One-click server launcher
 │
 ├── 🤖 AI Models
 │   ├── best.pt                     # Primary trained YOLO model (recommended)
@@ -105,8 +110,21 @@ PPE Detection/
 
 ### Quick Start
 
+#### Method 1: Automated Setup (Recommended) ⚡
+```bash
+# Step 1: Clone the repository
+git clone https://github.com/srinivas112004/Personal-Protective-Equipment-Detection-System.git
+cd Personal-Protective-Equipment-Detection-System
 
-####  Installation 🛠️
+# Step 2: Double-click to install dependencies
+install_dependencies.bat
+
+# Step 3: Double-click to start the server
+start_server.bat
+```
+The application will automatically open in your browser at `http://localhost:5000`
+
+#### Method 2: Manual Installation 🛠️
 ```bash
 # Step 1: Clone the repository
 git clone https://github.com/srinivas112004/Personal-Protective-Equipment-Detection-System.git
